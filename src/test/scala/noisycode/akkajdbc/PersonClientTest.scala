@@ -39,22 +39,22 @@ class PersonClientTest extends FlatSpec with Matchers with BeforeAndAfterAll {
     Await.result(client.personById(id2), 1 second) should be (expected2)
   }
 
-  //override def afterAll() {
-  //  val c = java.sql.DriverManager.getConnection(kernel.system.settings.config.getString("db.url"))
-  //  val personDelete = c.prepareStatement("delete from person where email=? OR email=?")
-  //  val addressDelete = c.prepareStatement("delete from address where city=?")
+  override def afterAll() {
+    val c = java.sql.DriverManager.getConnection(kernel.system.settings.config.getString("db.url"))
+    val personDelete = c.prepareStatement("delete from person where email=? OR email=?")
+    val addressDelete = c.prepareStatement("delete from address where city=?")
 
-  //  personDelete.setString(1, person1.email)
-  //  personDelete.setString(2, person2.email)
-  //  addressDelete.setString(1, person1.addresses.head.city)
+    personDelete.setString(1, person1.email)
+    personDelete.setString(2, person2.email)
+    addressDelete.setString(1, person1.addresses.head.city)
 
-  //  addressDelete.execute()
-  //  personDelete.execute()
+    addressDelete.execute()
+    personDelete.execute()
 
-  //  personDelete.close()
-  //  addressDelete.close()
-  //  c.close()
+    personDelete.close()
+    addressDelete.close()
+    c.close()
 
-  // kernel.shutdown
-  //}
+   kernel.shutdown
+  }
 }
