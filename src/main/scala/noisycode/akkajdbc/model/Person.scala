@@ -140,9 +140,10 @@ class PersonDaoActor(connFactory: () => Connection) extends Actor with ActorLogg
 private [model] trait PersonJdbc {
   val clause = "AND address.owner=person.id"
   val byIdQ = s"SELECT person.id,name,email,street,city FROM person,address WHERE person.id=? ${clause}"
+  val returnId = "select LAST_INSERT_ID()"
   val byEmailQ = s"SELECT person.id,name,email,street,city FROM person,address WHERE email=? ${clause}"
 
-  val insertPerson = "INSERT INTO person (name,email) VALUES (?,?) RETURNING id"
+  val insertPerson = "INSERT INTO person (name,email) VALUES (?,?)"
   val insertAddress = "INSERT INTO address (owner,street,city) VALUES (?,?,?)"
 
   /**
@@ -152,7 +153,8 @@ private [model] trait PersonJdbc {
     val s = c.prepareStatement(insertPerson)
     s.setString(1, p.name)
     s.setString(2, p.email)
-    val id = idFromResultSet(s.executeQuery())
+    s.executeUpdate()
+    val id = idFromResultSet(c.prepareStatement(returnId).executeQuery())
     s.close()
 
     addAddresses(c, id, p.addresses)
